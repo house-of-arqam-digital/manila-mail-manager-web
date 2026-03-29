@@ -1,0 +1,20 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- folder tab (raised, darker amber) -->
+  <rect x="26" y="26" width="44" height="26" rx="8" fill="#d97706"/>
+  <!-- folder back panel (darker amber) -->
+  <rect x="20" y="38" width="88" height="68" rx="14" fill="#d97706"/>
+  <!-- cream file peeking out, with a stepped tab on the left -->
+  <path d="M32 43
+           h20
+           a4 4 0 0 1 3 1.4
+           l4.6 5
+           a4 4 0 0 0 3 1.3
+           h30.4
+           a4 4 0 0 1 4 4
+           v12
+           h-69
+           a4 4 0 0 1 -4 -4
+           z" fill="#f6edda"/>
+  <!-- folder front panel (main amber) -->
+  <rect x="20" y="54" width="88" height="52" rx="14" fill="#ea7f0c"/>
+</svg>
