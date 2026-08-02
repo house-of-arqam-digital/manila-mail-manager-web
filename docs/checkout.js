@@ -5,7 +5,7 @@
   // ?token= parameter (still format-validated below).
   var PINNED_TOKENS = {
     production: '',
-    sandbox: ''
+    sandbox: 'test_ada703cc3868f5deec2266c1f40'
   };
 
   var TXN_PATTERN = /^txn_[a-z0-9]{1,64}$/;
