@@ -1,5 +1,16 @@
-// Runs `onEnter` the first time each matching element scrolls into view.
-function onFirstIntersection(selector, threshold, onEnter) {
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const hasObserver = 'IntersectionObserver' in window;
+
+// Runs `onEnter` the first time each matching element scrolls into view, or
+// `fallback` on every element when IntersectionObserver is unavailable.
+function onFirstIntersection(selector, threshold, onEnter, fallback = onEnter) {
+  const elements = document.querySelectorAll(selector);
+
+  if (!hasObserver) {
+    elements.forEach(fallback);
+    return;
+  }
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
@@ -8,17 +19,22 @@ function onFirstIntersection(selector, threshold, onEnter) {
     });
   }, { threshold });
 
-  document.querySelectorAll(selector).forEach(el => observer.observe(el));
+  elements.forEach(el => observer.observe(el));
 }
 
 const addVisibleClass = el => el.classList.add('visible');
+const counterTarget = el => Number(el.dataset.target) || 0;
 
 // Scroll reveal animation
 onFirstIntersection('.reveal', 0.15, addVisibleClass);
 
 // Animated counters
 onFirstIntersection('.counter', 0.5, (el) => {
-  const target = parseInt(el.dataset.target);
+  const target = counterTarget(el);
+  if (reduceMotion) {
+    el.textContent = target;
+    return;
+  }
   const duration = 1200;
   const start = performance.now();
   const animate = (now) => {
@@ -28,15 +44,31 @@ onFirstIntersection('.counter', 0.5, (el) => {
     if (progress < 1) requestAnimationFrame(animate);
   };
   requestAnimationFrame(animate);
-});
+}, el => { el.textContent = counterTarget(el); });
 
 // Scroll progress bar
-window.addEventListener('scroll', () => {
+const progressEl = document.getElementById('scroll-progress');
+let progressQueued = false;
+
+function updateScrollProgress() {
+  progressQueued = false;
   const scrollTop = document.documentElement.scrollTop;
-  const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-  const progress = (scrollTop / scrollHeight) * 100;
-  document.getElementById('scroll-progress').style.width = progress + '%';
-});
+  const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = scrollable > 0
+    ? Math.min(100, Math.max(0, (scrollTop / scrollable) * 100))
+    : 0;
+  progressEl.style.width = progress + '%';
+}
+
+function queueScrollProgress() {
+  if (progressQueued) return;
+  progressQueued = true;
+  requestAnimationFrame(updateScrollProgress);
+}
+
+window.addEventListener('scroll', queueScrollProgress, { passive: true });
+window.addEventListener('resize', queueScrollProgress, { passive: true });
+updateScrollProgress();
 
 // Typing effect
 const typingEl = document.getElementById('typing-line');
@@ -46,17 +78,24 @@ const phrases = [
   'See every subscription in one place.',
   'One click to clean up years of clutter.'
 ];
+const typingText = document.createTextNode('');
+const typingCursor = document.createElement('span');
+typingCursor.className = 'typing-cursor';
+typingEl.append(typingText, typingCursor);
+
 let phraseIndex = 0;
 let charIndex = 0;
 let isDeleting = false;
-let typingDelay = 50;
+let typingTimer = null;
 
 function type() {
   const current = phrases[phraseIndex];
-  typingEl.innerHTML = current.substring(0, charIndex) + '<span class="typing-cursor"></span>';
+  let typingDelay;
+
   if (!isDeleting) {
     charIndex++;
-    if (charIndex > current.length) {
+    if (charIndex >= current.length) {
+      charIndex = current.length;
       isDeleting = true;
       typingDelay = 2000;
     } else {
@@ -64,18 +103,35 @@ function type() {
     }
   } else {
     charIndex--;
-    if (charIndex < 0) {
+    if (charIndex <= 0) {
+      charIndex = 0;
       isDeleting = false;
       phraseIndex = (phraseIndex + 1) % phrases.length;
-      charIndex = 0;
       typingDelay = 400;
     } else {
       typingDelay = 25;
     }
   }
-  setTimeout(type, typingDelay);
+
+  typingText.nodeValue = current.substring(0, charIndex);
+  typingTimer = setTimeout(type, typingDelay);
 }
-setTimeout(type, 1000);
+
+function stopTyping() {
+  clearTimeout(typingTimer);
+  typingTimer = null;
+}
+
+if (reduceMotion) {
+  typingText.nodeValue = phrases[0];
+  typingCursor.remove();
+} else {
+  typingTimer = setTimeout(type, 1000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopTyping();
+    else if (!typingTimer) typingTimer = setTimeout(type, 400);
+  });
+}
 
 // Staggered pricing features
 onFirstIntersection('.pricing-features', 0.3, addVisibleClass);
@@ -103,6 +159,10 @@ const roller = document.getElementById('hero-roller');
 const rollerNumbers = [47, 52, 38, 61, 43, 55, 34, 49, 58, 41];
 let rollerIndex = 0;
 
+function clearRoller() {
+  while (roller.firstChild) roller.removeChild(roller.firstChild);
+}
+
 function createRollerDigit() {
   const d = document.createElement('span');
   d.className = 'roller-digit';
@@ -128,19 +188,26 @@ function setRollerValue(num) {
   });
 }
 
-setRollerValue(rollerNumbers[0]);
-setInterval(() => {
-  rollerIndex = (rollerIndex + 1) % rollerNumbers.length;
-  setRollerValue(rollerNumbers[rollerIndex]);
-}, 3000);
+if (!reduceMotion) {
+  clearRoller();
+  setRollerValue(rollerNumbers[0]);
+  setInterval(() => {
+    rollerIndex = (rollerIndex + 1) % rollerNumbers.length;
+    setRollerValue(rollerNumbers[rollerIndex]);
+  }, 3000);
+}
 
 // Show nav CTA after hero button scrolls out of view
 const navCta = document.getElementById('nav-cta');
 const heroCta = document.querySelector('.hero .hero-cta');
-if (navCta && heroCta) {
+if (navCta && heroCta && hasObserver) {
   const heroObserver = new IntersectionObserver(([entry]) => {
-    navCta.style.opacity = entry.isIntersecting ? '0' : '1';
-    navCta.style.pointerEvents = entry.isIntersecting ? 'none' : 'auto';
+    const hidden = entry.isIntersecting;
+    navCta.style.opacity = hidden ? '0' : '1';
+    navCta.style.visibility = hidden ? 'hidden' : 'visible';
+    navCta.style.pointerEvents = hidden ? 'none' : 'auto';
+    navCta.setAttribute('aria-hidden', String(hidden));
+    navCta.tabIndex = hidden ? -1 : 0;
   });
   heroObserver.observe(heroCta);
 }
@@ -148,9 +215,24 @@ if (navCta && heroCta) {
 // Mobile nav toggle
 const navToggle = document.getElementById('nav-toggle');
 const navLinks = document.getElementById('nav-links');
+
+function setNavOpen(open) {
+  navLinks.classList.toggle('open', open);
+  navToggle.setAttribute('aria-expanded', String(open));
+}
+
 navToggle.addEventListener('click', () => {
-  navLinks.classList.toggle('open');
+  setNavOpen(!navLinks.classList.contains('open'));
 });
 navLinks.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => navLinks.classList.remove('open'));
+  a.addEventListener('click', () => setNavOpen(false));
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && navLinks.classList.contains('open')) {
+    setNavOpen(false);
+    navToggle.focus();
+  }
+});
+document.addEventListener('click', (e) => {
+  if (navLinks.classList.contains('open') && !e.target.closest('nav')) setNavOpen(false);
 });

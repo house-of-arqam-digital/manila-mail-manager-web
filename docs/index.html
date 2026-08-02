@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>document.documentElement.className += ' js';</script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Manila Mail Manager — Clean up your inbox</title>
@@ -54,10 +55,10 @@
   <!-- Nav -->
   <nav>
     <a href="/" class="nav-logo">
-      <img src="icon.png" alt="Manila Mail Manager" onerror="this.style.display='none'">
+      <img src="icon.png" alt="Manila Mail Manager" width="28" height="28" onerror="this.style.display='none'">
       Manila Mail Manager
     </a>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
     <div class="nav-links" id="nav-links">
@@ -65,7 +66,7 @@
       <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
       <!-- TODO: replace with Chrome Web Store URL -->
-      <a href="#" class="hero-cta nav-cta" id="nav-cta" style="padding:8px 16px;font-size:13px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity 0.3s ease;">Add to Chrome</a>
+      <a href="#" class="hero-cta nav-cta" id="nav-cta" tabindex="-1" aria-hidden="true" style="padding:8px 16px;font-size:13px;border-radius:8px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity 0.3s ease, visibility 0s linear 0.3s;">Add to Chrome</a>
     </div>
   </nav>
 
@@ -74,7 +75,7 @@
     <div class="hero-grid">
       <div class="hero-copy">
         <span class="hero-badge">Reclaim your inbox</span>
-        <h1>You get <span><span class="roller" id="hero-roller"></span> subscription emails</span> a week. Most of them you don't read.</h1>
+        <h1>You get <span><span class="sr-only">dozens of</span><span class="roller" id="hero-roller" aria-hidden="true">47</span> subscription emails</span> a week. Most of them you don't read.</h1>
         <p>Manila Mail Manager finds every subscription in your Gmail inbox and lets you unsubscribe in seconds.</p>
         <p class="typing-line" id="typing-line"></p>
         <!-- TODO: replace with Chrome Web Store URL -->
@@ -87,7 +88,7 @@
           <div class="folder-tab"></div>
           <div class="folder-body">
             <!-- TODO: replace with updated screenshot of the new popup UI -->
-            <img src="screenshot-popup.png" alt="Manila Mail Manager popup showing subscription list" class="folder-shot">
+            <img src="screenshot-popup.png" alt="Manila Mail Manager popup showing subscription list" class="folder-shot" width="758" height="1196">
           </div>
         </div>
       </div>
@@ -222,7 +223,7 @@
         </div>
       </div>
       <!-- TODO: replace with updated screenshot of the new subscriptions page -->
-      <img src="screenshot-subscriptions.png" alt="Manila Mail Manager subscription management" class="screenshot-img reveal reveal-delay-2">
+      <img src="screenshot-subscriptions.png" alt="Manila Mail Manager subscription management" class="screenshot-img reveal reveal-delay-2" width="814" height="1134" loading="lazy">
     </div>
   </section>
 
@@ -258,7 +259,9 @@
             <li>Unlimited tracked subscriptions</li>
             <li>Bulk unsubscribe</li>
           </ul>
-          <a href="checkout.html" class="pricing-btn pricing-btn-primary">Start Free Trial</a>
+          <!-- Pro is started from inside the extension; checkout.html needs a Paddle
+               transaction and can't be linked to directly. -->
+          <a href="#install" class="pricing-btn pricing-btn-primary">Start Free Trial</a>
         </div>
       </div>
     </div>
@@ -312,7 +315,7 @@
   <!-- Footer -->
   <footer>
     <div class="footer-left">
-      <img src="hoa-logo.png" alt="House of Arqam Digital" style="width:24px;height:24px;vertical-align:-4px;margin-right:8px;">
+      <img src="hoa-logo.png" alt="House of Arqam Digital" width="24" height="24" loading="lazy" style="width:24px;height:24px;vertical-align:-4px;margin-right:8px;">
       Made by House of Arqam Digital
     </div>
     <div class="footer-links">

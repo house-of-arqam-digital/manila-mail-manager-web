@@ -1,6 +1,13 @@
-/* Shared reset and typography base for every page. */
+/* Shared reset, font stack and brand palette for every page. */
 :root {
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --paper: #FBF7EF;      /* warm manila page background */
+  --ink: #2B2620;        /* warm near-black headings */
+  --muted: #6B6157;      /* warm body text */
+  --accent: #EA7F0C;
+  --accent-d: #C76A06;
+  --kraft: #F0E2C6;      /* folder frame */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }

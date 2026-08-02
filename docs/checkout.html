@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
   <title>Checkout - Manila Mail Manager</title>
+  <link rel="icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="assets/base.css">
   <link rel="stylesheet" href="assets/checkout.css">
 </head>
@@ -11,7 +13,7 @@
   <div class="container">
     <h1>Manila Mail Manager</h1>
     <p class="subtitle">Pro Subscription</p>
-    <div id="status">
+    <div id="status" role="status" aria-live="polite">
       <div class="spinner"></div>
       <div class="status">Loading checkout...</div>
     </div>
@@ -20,41 +22,107 @@
   <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
   <script>
     (function() {
+      // Paddle client-side tokens are public, but pinning ours here stops anyone from
+      // opening a checkout on this domain that pays into their own Paddle account.
+      // TODO: paste the production client-side token from the Paddle dashboard.
+      var PADDLE_CLIENT_TOKEN = '';
+      var ALLOWED_ENVIRONMENTS = ['production', 'sandbox'];
+      var LOAD_TIMEOUT_MS = 15000;
+
       var params = new URLSearchParams(window.location.search);
       var txnId = params.get('txn');
-      var token = params.get('token');
-      var env = params.get('env') || 'sandbox';
-      var returnUrl = params.get('return');
+      var token = PADDLE_CLIENT_TOKEN || params.get('token');
+      var env = params.get('env') || 'production';
       var statusEl = document.getElementById('status');
+      var settled = false;
 
-      var RETRY_BUTTON = '<button class="retry-btn" onclick="location.reload()">Try Again</button>';
-
-      function render(className, html, withRetry) {
-        statusEl.innerHTML = '<div class="' + className + '">' + html + '</div>' +
-          (withRetry ? RETRY_BUTTON : '');
+      function render(nodes) {
+        settled = true;
+        statusEl.replaceChildren.apply(statusEl, nodes);
       }
 
-      function showError(msg, withRetry) {
-        render('error', msg, withRetry);
+      function message(className, text) {
+        var el = document.createElement('div');
+        el.className = className;
+        el.textContent = text;
+        return el;
       }
 
-      if (!txnId || !token) {
-        showError('Missing checkout parameters.', false);
+      function hint(text) {
+        var el = document.createElement('p');
+        el.className = 'hint';
+        el.textContent = text;
+        return el;
+      }
+
+      function retryButton() {
+        var btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.type = 'button';
+        btn.textContent = 'Try Again';
+        btn.addEventListener('click', function() { location.reload(); });
+        return btn;
+      }
+
+      function homeLink() {
+        var a = document.createElement('a');
+        a.className = 'btn';
+        a.href = '/';
+        a.textContent = 'Back to Manila Mail Manager';
+        return a;
+      }
+
+      function showError(text) {
+        render([message('error', text), retryButton()]);
+      }
+
+      if (ALLOWED_ENVIRONMENTS.indexOf(env) === -1) {
+        render([message('error', 'Unknown checkout environment.'), homeLink()]);
         return;
       }
 
-      try {
-        if (env === 'sandbox') {
-          Paddle.Environment.set('sandbox');
+      if (!txnId || !token) {
+        render([
+          message('error', 'This checkout link is incomplete.'),
+          hint('Start your upgrade from the extension: open Manila Mail Manager, go to Settings and choose Upgrade to Pro.'),
+          homeLink()
+        ]);
+        return;
+      }
+
+      var loadTimer = setTimeout(function() {
+        if (!settled) {
+          showError('Could not reach our payment provider. Check your connection or any ad blocker, then try again.');
         }
+      }, LOAD_TIMEOUT_MS);
+
+      try {
+        if (typeof Paddle === 'undefined') throw new Error('the payment provider did not load');
+
+        Paddle.Environment.set(env);
         Paddle.Initialize({
           token: token,
           eventCallback: function(event) {
+            if (event.name === 'checkout.loaded') {
+              settled = true;
+              clearTimeout(loadTimer);
+            }
             if (event.name === 'checkout.completed') {
-              render('status success', '&#10003; Payment successful!<br><br><span class="status-note">You can close this tab and return to the extension.<br>Your Pro features are now active.</span>', false);
+              clearTimeout(loadTimer);
+              var done = message('status', '\u2713 Payment successful!');
+              done.style.color = '#15803d';
+              render([
+                done,
+                hint('You can close this tab and return to the extension. Your Pro features are now active.')
+              ]);
+            }
+            if (event.name === 'checkout.error') {
+              clearTimeout(loadTimer);
+              showError('Something went wrong with the checkout. Please try again.');
             }
             if (event.name === 'checkout.closed') {
-              render('status', 'Checkout closed.', true);
+              clearTimeout(loadTimer);
+              render([message('status', 'Checkout closed.'), retryButton()]);
             }
           }
         });
@@ -67,7 +135,8 @@
           }
         });
       } catch(e) {
-        showError('Failed to load checkout: ' + e.message, true);
+        clearTimeout(loadTimer);
+        showError('Failed to load checkout: ' + e.message);
       }
     })();
   </script>
