@@ -3,61 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.paddle.com https://*.paddle.com; connect-src https://*.paddle.com; frame-src https://*.paddle.com; img-src 'self' data: https://*.paddle.com; style-src 'self' 'unsafe-inline' https://*.paddle.com; font-src https://*.paddle.com; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="robots" content="noindex, nofollow">
   <title>Checkout - Manila Mail Manager</title>
   <link rel="icon" type="image/png" href="favicon.png">
-  <style>
-    :root {
-      --paper: #FBF7EF;
-      --ink: #2B2620;
-      --muted: #6B6157;
-      --accent: #EA7F0C;
-      --accent-d: #C76A06;
-      --kraft: #F0E2C6;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--paper);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--ink);
-    }
-    .container {
-      background: #fff;
-      border-radius: 16px;
-      padding: 40px;
-      max-width: 480px;
-      width: 90%;
-      box-shadow: 0 22px 55px rgba(120,80,20,0.16);
-      text-align: center;
-    }
-    h1 { font-size: 24px; margin-bottom: 8px; }
-    .subtitle { color: var(--muted); margin-bottom: 24px; }
-    .status { color: var(--muted); font-size: 16px; padding: 20px 0; }
-    .error { color: #b91c1c; font-size: 14px; padding: 20px 0 8px; }
-    .hint { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
-    .spinner {
-      width: 32px; height: 32px;
-      border: 3px solid var(--kraft);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 16px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .btn {
-      display: inline-block; background: var(--accent); color: #fff; border: none;
-      padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600;
-      font-family: inherit; text-decoration: none; cursor: pointer; margin-top: 12px;
-    }
-    .btn:hover { background: var(--accent-d); }
-    @media (prefers-reduced-motion: reduce) {
-      .spinner { animation-duration: 2.4s; }
-    }
-  </style>
+  <link rel="stylesheet" href="assets/base.css">
+  <link rel="stylesheet" href="assets/checkout.css">
 </head>
 <body>
   <div class="container">
@@ -70,131 +22,6 @@
   </div>
 
   <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
-  <script>
-    (function() {
-      // Paddle client-side tokens are public, but pinning ours here stops anyone from
-      // opening a checkout on this domain that pays into their own Paddle account.
-      // TODO: paste the production client-side token from the Paddle dashboard.
-      var PADDLE_CLIENT_TOKEN = '';
-      var ALLOWED_ENVIRONMENTS = ['production', 'sandbox'];
-      var LOAD_TIMEOUT_MS = 15000;
-
-      var params = new URLSearchParams(window.location.search);
-      var txnId = params.get('txn');
-      var token = PADDLE_CLIENT_TOKEN || params.get('token');
-      var env = params.get('env') || 'production';
-      var statusEl = document.getElementById('status');
-      var settled = false;
-      var errorShown = false;
-
-      function render(nodes) {
-        settled = true;
-        statusEl.replaceChildren.apply(statusEl, nodes);
-      }
-
-      function message(className, text) {
-        var el = document.createElement('div');
-        el.className = className;
-        el.textContent = text;
-        return el;
-      }
-
-      function hint(text) {
-        var el = document.createElement('p');
-        el.className = 'hint';
-        el.textContent = text;
-        return el;
-      }
-
-      function retryButton() {
-        var btn = document.createElement('button');
-        btn.className = 'btn';
-        btn.type = 'button';
-        btn.textContent = 'Try Again';
-        btn.addEventListener('click', function() { location.reload(); });
-        return btn;
-      }
-
-      function homeLink() {
-        var a = document.createElement('a');
-        a.className = 'btn';
-        a.href = '/';
-        a.textContent = 'Back to Manila Mail Manager';
-        return a;
-      }
-
-      function showError(text) {
-        errorShown = true;
-        render([message('error', text), retryButton()]);
-      }
-
-      if (ALLOWED_ENVIRONMENTS.indexOf(env) === -1) {
-        render([message('error', 'Unknown checkout environment.'), homeLink()]);
-        return;
-      }
-
-      if (!txnId || !token) {
-        render([
-          message('error', 'This checkout link is incomplete.'),
-          hint('Start your upgrade from the extension: open Manila Mail Manager, go to Settings and choose Upgrade to Pro.'),
-          homeLink()
-        ]);
-        return;
-      }
-
-      var loadTimer = setTimeout(function() {
-        if (!settled) {
-          showError('Could not reach our payment provider. Check your connection or any ad blocker, then try again.');
-        }
-      }, LOAD_TIMEOUT_MS);
-
-      try {
-        if (typeof Paddle === 'undefined') throw new Error('the payment provider did not load');
-
-        Paddle.Environment.set(env);
-        Paddle.Initialize({
-          token: token,
-          eventCallback: function(event) {
-            if (event.name === 'checkout.loaded') {
-              settled = true;
-              clearTimeout(loadTimer);
-            }
-            if (event.name === 'checkout.completed') {
-              clearTimeout(loadTimer);
-              var done = message('status', '\u2713 Payment successful!');
-              done.style.color = '#15803d';
-              render([
-                done,
-                hint('You can close this tab and return to the extension. Your Pro features are now active.')
-              ]);
-            }
-            if (event.name === 'checkout.error') {
-              clearTimeout(loadTimer);
-              var detail = event && event.detail;
-              if (detail && typeof detail === 'object') {
-                detail = detail.message || detail.detail || JSON.stringify(detail);
-              }
-              showError('Checkout error: ' + (detail || 'An unexpected error occurred during checkout.'));
-            }
-            if (event.name === 'checkout.closed' && !errorShown) {
-              clearTimeout(loadTimer);
-              render([message('status', 'Checkout closed.'), retryButton()]);
-            }
-          }
-        });
-
-        Paddle.Checkout.open({
-          transactionId: txnId,
-          settings: {
-            displayMode: 'overlay',
-            theme: 'light'
-          }
-        });
-      } catch(e) {
-        clearTimeout(loadTimer);
-        showError('Failed to load checkout: ' + e.message);
-      }
-    })();
-  </script>
+  <script src="checkout.js"></script>
 </body>
 </html>
