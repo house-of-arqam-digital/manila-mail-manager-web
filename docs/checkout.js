@@ -18,6 +18,7 @@
   var token = PINNED_TOKENS[env] || params.get('token');
   var statusEl = document.getElementById('status');
   var settled = false;
+  var errorShown = false;
 
   function render(nodes) {
     settled = true;
@@ -56,6 +57,7 @@
   }
 
   function showError(text) {
+    errorShown = true;
     render([message('error', text), retryButton()]);
   }
 
@@ -106,9 +108,13 @@
         }
         if (event.name === 'checkout.error') {
           clearTimeout(loadTimer);
-          showError('Something went wrong with the checkout. Please try again.');
+          var detail = event && event.detail;
+          if (detail && typeof detail === 'object') {
+            detail = detail.message || detail.detail || JSON.stringify(detail);
+          }
+          showError('Checkout error: ' + (detail || 'An unexpected error occurred during checkout.'));
         }
-        if (event.name === 'checkout.closed') {
+        if (event.name === 'checkout.closed' && !errorShown) {
           clearTimeout(loadTimer);
           render([message('status', 'Checkout closed.'), retryButton()]);
         }
