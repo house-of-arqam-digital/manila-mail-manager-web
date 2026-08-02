@@ -125,7 +125,7 @@
         theme: 'light'
       }
     });
-  } catch (e) {
+  } catch (_e) {
     clearTimeout(loadTimer);
     showError('Failed to load checkout. Please try again.');
   }
