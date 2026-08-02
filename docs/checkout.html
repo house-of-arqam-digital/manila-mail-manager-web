@@ -103,10 +103,11 @@
                 '<button class="retry-btn" onclick="location.reload()">Try Again</button>';
             }
             if (event.name === 'checkout.error') {
-              var detail = event && event.detail
-                ? event.detail
-                : 'An unexpected error occurred during checkout.';
-              showError('Checkout error: ' + detail);
+              var detail = event && event.detail;
+              if (detail && typeof detail === 'object') {
+                detail = detail.message || detail.detail || JSON.stringify(detail);
+              }
+              showError('Checkout error: ' + (detail || 'An unexpected error occurred during checkout.'));
             }
           }
         });
