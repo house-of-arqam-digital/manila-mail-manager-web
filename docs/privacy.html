@@ -14,13 +14,14 @@
   <div class="container">
     <a href="/" class="back">&larr; Back to Manila Mail Manager</a>
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: May 14, 2026</p>
+    <p class="updated">Last updated: August 2, 2026</p>
 
     <h2>The short version</h2>
-    <p>Manila Mail Manager operates no servers. All processing happens in your browser. Your email contents are never sent to us or anyone else — they never leave your device.</p>
+    <p>Your email content never leaves your browser. All scanning and subscription detection happens locally on your device. The only network requests the extension makes are to our licensing service — for free trials, Pro checkout, and license verification — and those requests never include email content.</p>
 
     <h2>What we collect</h2>
     <p>Subscription detection runs locally in your browser as you use Gmail. We do not collect, store, or transmit your email content to any external server.</p>
+    <p>If you start a free trial or subscribe to Pro, the extension contacts our licensing service (hosted on Cloudflare Workers). These requests contain only a randomly generated visitor ID, your chosen plan, your extension version, and — for license checks — your license key or subscription ID. They never contain email content, sender lists, or anything derived from your inbox.</p>
 
     <h2>Data that stays on your device</h2>
     <ul>
@@ -30,10 +31,10 @@
       <li>Unsubscribe history</li>
       <li>Locally-computed analytics snapshots</li>
     </ul>
-    <p>All of this data is stored in Chrome's local storage on your device. We have no servers, so there is nowhere for it to be sent.</p>
+    <p>All of this data is stored in Chrome's local storage on your device and is never uploaded. If you activate Pro, your license key (a signed token that contains no personal information) is also saved to Chrome's sync storage, so Chrome may sync it across browsers signed into your Google profile.</p>
 
     <h2>Unsubscribe requests</h2>
-    <p>When you unsubscribe from a sender, the extension opens that sender's own unsubscribe page (or the original email) in a new tab so you can confirm directly with them. This happens entirely between your browser and the sender — it never passes through any Manila Mail Manager server, because no such server exists.</p>
+    <p>When you unsubscribe from a sender, the extension opens that sender's own unsubscribe page (or the original email) in a new tab so you can confirm directly with them. This happens entirely between your browser and the sender — it never passes through any Manila Mail Manager server.</p>
 
     <h2>Payment information</h2>
     <p>Payments are processed by <a href="https://www.paddle.com/legal/privacy">Paddle</a>. We do not store credit card numbers or billing details. Paddle handles all payment processing under their own privacy policy.</p>
@@ -43,13 +44,15 @@
 
     <h2>Third-party services</h2>
     <ul>
-      <li><strong>Paddle</strong> — for payment processing (if you subscribe to Pro)</li>
+      <li><strong>Cloudflare Workers</strong> — hosts our licensing service, which handles free trials, creates Pro checkouts, and verifies license keys. It receives a random visitor ID, plan, extension version, and license/subscription identifiers — never email content.</li>
+      <li><strong>Paddle</strong> — for payment processing (if you subscribe to Pro). Paddle is the merchant of record and handles your billing details under its own privacy policy.</li>
+      <li><strong>Google (Chrome Sync)</strong> — your Pro license key may be synced across your Chrome browsers via Chrome's built-in sync storage.</li>
       <li><strong>Google</strong> — the extension may load your own Google profile photo from Google's servers to show which account you're viewing. No email content is involved, and the photo is only displayed locally.</li>
     </ul>
 
     <h2>Data deletion and your rights</h2>
     <p>You can delete all stored data at any time from Settings &gt; Data &gt; Clear All Data. Uninstalling the extension also removes all local data.</p>
-    <p>Under GDPR (EU), CCPA (California), and similar privacy laws, you have rights to access, correct, export, and delete your personal data. Because all your data is already on your own device, you can exercise these rights directly: open the extension's storage in Chrome's developer tools to view it, or clear it via Settings or uninstall. We don't hold any data about you separately.</p>
+    <p>Under GDPR (EU), CCPA (California), and similar privacy laws, you have rights to access, correct, export, and delete your personal data. Because your subscription data lives on your own device, you can exercise these rights directly: view or export it via Settings, or clear it via Settings or uninstall. Our licensing service keeps only the minimal records needed to honor trials and subscriptions (visitor ID, license and subscription identifiers); email <a href="mailto:support@manilamail.app">support@manilamail.app</a> to have those deleted.</p>
 
     <h2>Children</h2>
     <p>Manila Mail Manager is not directed at children under 13. We do not knowingly collect any data from anyone, including children.</p>
