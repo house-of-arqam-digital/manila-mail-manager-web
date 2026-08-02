@@ -65,14 +65,27 @@
       var returnUrl = params.get('return');
       var statusEl = document.getElementById('status');
 
+      function showError(msg) {
+        statusEl.innerHTML = '';
+        var errorEl = document.createElement('div');
+        errorEl.className = 'error';
+        errorEl.textContent = msg;
+        var retryBtn = document.createElement('button');
+        retryBtn.className = 'retry-btn';
+        retryBtn.textContent = 'Try Again';
+        retryBtn.addEventListener('click', function() { location.reload(); });
+        statusEl.appendChild(errorEl);
+        statusEl.appendChild(retryBtn);
+      }
+
       if (!txnId || !token) {
         statusEl.innerHTML = '<div class="error">Missing checkout parameters.</div>';
         return;
       }
 
-      function showError(msg) {
-        statusEl.innerHTML = '<div class="error">' + msg + '</div>' +
-          '<button class="retry-btn" onclick="location.reload()">Try Again</button>';
+      if (typeof Paddle === 'undefined') {
+        showError('Unable to load the payment library. Please check your connection and try again.');
+        return;
       }
 
       try {
@@ -88,6 +101,12 @@
             if (event.name === 'checkout.closed') {
               statusEl.innerHTML = '<div class="status">Checkout closed.</div>' +
                 '<button class="retry-btn" onclick="location.reload()">Try Again</button>';
+            }
+            if (event.name === 'checkout.error') {
+              var detail = event && event.detail
+                ? event.detail
+                : 'An unexpected error occurred during checkout.';
+              showError('Checkout error: ' + detail);
             }
           }
         });
