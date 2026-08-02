@@ -1,21 +1,18 @@
 (function() {
   // Paddle client-side tokens are public, but pinning ours here stops anyone from
   // opening a checkout on this domain that pays into their own Paddle account.
-  // An empty value falls back to the ?token= parameter (still format-validated below).
-  // TODO: paste the production client-side token from the Paddle dashboard.
+  // Both environments are pinned, so ?token= is never honoured.
   var PINNED_TOKENS = {
-    production: '',
+    production: 'live_71ddd802c4fbd34916ef9b59dc8',
     sandbox: 'test_ada703cc3868f5deec2266c1f40'
   };
-  var ALLOWED_ENVIRONMENTS = ['production', 'sandbox'];
   var TXN_PATTERN = /^txn_[a-z0-9]{1,64}$/;
-  var TOKEN_PATTERN = /^(live|test)_[a-z0-9]{16,80}$/;
   var LOAD_TIMEOUT_MS = 15000;
 
   var params = new URLSearchParams(window.location.search);
   var txnId = params.get('txn');
   var env = params.get('env') || 'production';
-  var token = PINNED_TOKENS[env] || params.get('token');
+  var token = PINNED_TOKENS[env];
   var statusEl = document.getElementById('status');
   var settled = false;
 
@@ -59,12 +56,12 @@
     render([message('error', text), retryButton()]);
   }
 
-  if (ALLOWED_ENVIRONMENTS.indexOf(env) === -1) {
+  if (!token) {
     render([message('error', 'Unknown checkout environment.'), homeLink()]);
     return;
   }
 
-  if (!txnId || !token) {
+  if (!txnId) {
     render([
       message('error', 'This checkout link is incomplete.'),
       hint('Start your upgrade from the extension: open Manila Mail Manager, go to Settings and choose Upgrade to Pro.'),
@@ -73,7 +70,7 @@
     return;
   }
 
-  if (!TXN_PATTERN.test(txnId) || !TOKEN_PATTERN.test(token)) {
+  if (!TXN_PATTERN.test(txnId)) {
     render([message('error', 'This checkout link is not valid.'), homeLink()]);
     return;
   }
