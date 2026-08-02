@@ -12,7 +12,7 @@
   var params = new URLSearchParams(window.location.search);
   var txnId = params.get('txn');
   var env = params.get('env') || 'production';
-  var token = PINNED_TOKENS[env];
+  var token = Object.prototype.hasOwnProperty.call(PINNED_TOKENS, env) ? PINNED_TOKENS[env] : '';
   var statusEl = document.getElementById('status');
   var settled = false;
 
