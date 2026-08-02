@@ -5,53 +5,67 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.paddle.com https://*.paddle.com; connect-src https://*.paddle.com; frame-src https://*.paddle.com; img-src 'self' data: https://*.paddle.com; style-src 'self' 'unsafe-inline' https://*.paddle.com; font-src https://*.paddle.com; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex, nofollow">
   <title>Checkout - Manila Mail Manager</title>
+  <link rel="icon" type="image/png" href="favicon.png">
   <style>
+    :root {
+      --paper: #FBF7EF;
+      --ink: #2B2620;
+      --muted: #6B6157;
+      --accent: #EA7F0C;
+      --accent-d: #C76A06;
+      --kraft: #F0E2C6;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: var(--paper);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #333;
+      color: var(--ink);
     }
     .container {
-      background: white;
+      background: #fff;
       border-radius: 16px;
       padding: 40px;
       max-width: 480px;
       width: 90%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      box-shadow: 0 22px 55px rgba(120,80,20,0.16);
       text-align: center;
     }
     h1 { font-size: 24px; margin-bottom: 8px; }
-    .subtitle { color: #666; margin-bottom: 24px; }
-    .status { color: #888; font-size: 16px; padding: 20px 0; }
-    .error { color: #ef4444; font-size: 14px; padding: 20px 0; }
+    .subtitle { color: var(--muted); margin-bottom: 24px; }
+    .status { color: var(--muted); font-size: 16px; padding: 20px 0; }
+    .error { color: #b91c1c; font-size: 14px; padding: 20px 0 8px; }
+    .hint { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
     .spinner {
       width: 32px; height: 32px;
-      border: 3px solid #eee;
-      border-top-color: #764ba2;
+      border: 3px solid var(--kraft);
+      border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin: 0 auto 16px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .retry-btn {
-      background: #764ba2; color: white; border: none;
-      padding: 12px 24px; border-radius: 8px; font-size: 14px;
-      cursor: pointer; margin-top: 12px;
+    .btn {
+      display: inline-block; background: var(--accent); color: #fff; border: none;
+      padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      font-family: inherit; text-decoration: none; cursor: pointer; margin-top: 12px;
     }
-    .retry-btn:hover { background: #653890; }
+    .btn:hover { background: var(--accent-d); }
+    @media (prefers-reduced-motion: reduce) {
+      .spinner { animation-duration: 2.4s; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Manila Mail Manager</h1>
     <p class="subtitle">Pro Subscription</p>
-    <div id="status">
+    <div id="status" role="status" aria-live="polite">
       <div class="spinner"></div>
       <div class="status">Loading checkout...</div>
     </div>
