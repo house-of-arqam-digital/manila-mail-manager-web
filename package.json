@@ -1,0 +1,20 @@
+{
+  "name": "manila-mail-manager-web",
+  "version": "1.0.0",
+  "description": "Static marketing and checkout site for Manila Mail Manager (served from docs/ via GitHub Pages)",
+  "private": true,
+  "scripts": {
+    "lint": "eslint docs",
+    "lint:html": "html-validate \"docs/**/*.html\"",
+    "check": "npm run lint && npm run lint:html",
+    "serve": "python3 -m http.server 8899 --directory docs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "html-validate": "^9.7.1"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}
