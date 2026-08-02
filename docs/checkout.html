@@ -64,8 +64,10 @@
       var env = params.get('env') || 'sandbox';
       var returnUrl = params.get('return');
       var statusEl = document.getElementById('status');
+      var errorShown = false;
 
       function showError(msg) {
+        errorShown = true;
         statusEl.innerHTML = '';
         var errorEl = document.createElement('div');
         errorEl.className = 'error';
@@ -98,7 +100,7 @@
             if (event.name === 'checkout.completed') {
               statusEl.innerHTML = '<div class="status" style="color:#10b981;">&#10003; Payment successful!<br><br><span style="font-size:14px;color:#666;">You can close this tab and return to the extension.<br>Your Pro features are now active.</span></div>';
             }
-            if (event.name === 'checkout.closed') {
+            if (event.name === 'checkout.closed' && !errorShown) {
               statusEl.innerHTML = '<div class="status">Checkout closed.</div>' +
                 '<button class="retry-btn" onclick="location.reload()">Try Again</button>';
             }
