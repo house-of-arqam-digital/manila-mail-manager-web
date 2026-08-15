@@ -94,6 +94,31 @@ prove paddle.js loads, the overlay iframe opens, and CSP allows frame/script/con
 CORS/403 errors from `sandbox-checkout-service.paddle.com`; that is expected with a fake token, not a
 site bug.
 
+## key.html (license-key copy page)
+
+`docs/key.html` + `docs/key.js` read the key from the URL **fragment** (`key.html#k=<jwt>`), so:
+
+- The fragment never reaches the server; `key.js` runs once on load. **Changing only the hash does not
+  re-run it** — after editing `#k=...` in the omnibox you must reload (`ctrl+r`), otherwise you are
+  looking at the previous render and may wrongly report the wrong error string.
+- States: no `#k` → `This link is missing your license key.`; `#k` failing
+  `/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/` → `This link does not contain a valid license
+  key.`; both add a purchase-email / "Restore purchase" hint plus a "Back to Manila Mail Manager"
+  button. Valid → `<pre class="key-block">` + "Copy key" + 3-step list.
+- Use a **synthetic** 3-segment base64url token (generate one with python base64) — never a real
+  license key — and never type a long token into the omnibox: xdotool `type` drops characters in
+  ~300-char strings and you will silently test a mangled key. Instead serve a tiny local launcher page
+  containing an `<a href="https://manilamail.app/key.html#k=<token>">` and click it.
+- To prove the clipboard really holds the key without devtools, serve a local paste-target page with a
+  `<textarea>` that compares the pasted value against the expected token (fetch it from a sibling
+  `expected.txt`) and prints `length` + `exact match: YES/NO`; then Ctrl+V into it. `xclip`/`xsel` are
+  not installed on the box.
+- Testing the real `navigator.clipboard` path requires a secure context, i.e. the live
+  `https://manilamail.app/key.html`; over `http://localhost` Chrome still counts as secure, but the
+  production URL is the only way to prove the deployed page.
+- Mobile check: resize the OS window (`wmctrl -r :ACTIVE: -b remove,maximized_vert,maximized_horz`
+  then `wmctrl -r :ACTIVE: -e 0,0,0,390,760`) rather than devtools device mode.
+
 ## Verifying CSP
 
 CSP is delivered via `<meta http-equiv="Content-Security-Policy">` in each page (added by the
