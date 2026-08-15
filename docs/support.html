@@ -3,23 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Support — Manila Mail Manager</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="assets/base.css">
   <link rel="stylesheet" href="assets/doc-page.css">
+  <script src="assets/theme.js"></script>
   <style>
     .contact-box {
       margin: 16px 0 32px;
       padding: 16px 18px;
-      background: #fffbeb;
-      border: 1px solid #fde68a;
+      background: light-dark(#fffbeb, #2A2011);
+      border: 1px solid light-dark(#fde68a, #4A3714);
       border-radius: 10px;
       font-size: 15px;
-      color: #92400e;
+      color: light-dark(#92400e, #F0C286);
     }
-    .contact-box a { color: #b45309; font-weight: 600; }
+    .contact-box a { color: light-dark(#b45309, #F5A93C); font-weight: 600; }
     h2 { margin: 32px 0 8px; }
   </style>
 </head>
@@ -48,11 +49,17 @@
     <h2>How do I activate Pro?</h2>
     <p>Pro activates automatically: after payment, the extension detects your completed checkout and unlocks Pro within a couple of minutes — you can close the checkout tab as soon as payment succeeds. If you have a license key (for example from another device), open the extension &rarr; <strong>Settings</strong>, paste it into "License key", and click <strong>Activate</strong>.</p>
 
+    <h2>How many devices can I use Pro on?</h2>
+    <p>Up to <strong>three</strong>, and a separate Chrome profile counts as one of them — so a work laptop, a home machine and a second profile all fit. Paste your license key into <strong>Settings</strong> on each one.</p>
+
+    <h2>It says I've used all my devices.</h2>
+    <p>That happens after a reinstall, clearing the extension's data, or a new laptop — the old installation still holds a slot. Open <strong>Settings</strong> &rarr; <strong>Deactivate my other devices</strong>, then click <strong>Activate</strong> on the device you're using now; the released devices drop back to the free tier the next time they check in. Still stuck? Email us.</p>
+
     <h2>I lost my license key.</h2>
-    <p>Your license key is available in the extension under <strong>Settings</strong> while Pro is active. If Pro never activated after payment, email <a href="mailto:support@manilamail.app">support@manilamail.app</a> from the address you bought with and we'll sort it out.</p>
+    <p>Your license key is available in the extension under <strong>Settings</strong> while Pro is active, and the purchase email we sent you contains it too — that email has an “Open your license key” link that shows the key with a copy button. If Pro never activated after payment, email <a href="mailto:support@manilamail.app">support@manilamail.app</a> from the address you bought with and we'll sort it out.</p>
 
     <h2>How do I cancel or get a refund?</h2>
-    <p>You can cancel anytime from the extension's Settings or through Paddle; access continues until the end of your billing period. Not satisfied? We offer a 14-day money-back guarantee — see our <a href="terms.html#refunds">Refund Policy</a>.</p>
+    <p>You can cancel anytime from the extension's Settings or through Paddle; access continues until the end of your billing period, and the extension drops back to the free tier on its own within a few days of that. Not satisfied? We offer a 14-day money-back guarantee — see our <a href="terms.html#refunds">Refund Policy</a>.</p>
 
     <h2>Detection looks broken / "detection paused"</h2>
     <p>Gmail occasionally changes its layout. If you see a "detection is paused" notice, reload Gmail and make sure you're on the latest version of the extension. If it persists, email us — we'll push a fix.</p>

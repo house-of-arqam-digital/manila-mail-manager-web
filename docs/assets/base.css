@@ -1,15 +1,28 @@
-/* Shared reset, font stack and brand palette for every page. */
+/* Shared reset, font stack and brand palette for every page.
+   Colors use light-dark(), so every page follows the OS theme; the home page
+   additionally flips it explicitly by setting data-theme on <html>. */
 :root {
+  color-scheme: light dark;
+
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  --paper: #FBF7EF;      /* warm manila page background */
-  --ink: #2B2620;        /* warm near-black headings */
-  --muted: #6B6157;      /* warm body text */
-  --accent: #EA7F0C;
-  --accent-d: #C76A06;
-  --kraft: #F0E2C6;      /* folder frame */
+  --paper: light-dark(#FBF7EF, #16130E);   /* warm manila page background */
+  --ink: light-dark(#2B2620, #F4EEE4);     /* warm near-black headings */
+  --muted: light-dark(#6B6157, #B7AB9B);   /* warm body text */
+  --accent: light-dark(#EA7F0C, #F59B3C);
+  --accent-d: light-dark(#C76A06, #FFB05E);
+  --kraft: light-dark(#F0E2C6, #2A2318);   /* folder frame */
 }
+
+:root[data-theme='light'] { color-scheme: light; }
+:root[data-theme='dark'] { color-scheme: dark; }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body { font-family: var(--font-sans); }
+
+:where(a, button, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
