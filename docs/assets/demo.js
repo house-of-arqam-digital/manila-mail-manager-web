@@ -102,6 +102,8 @@ if (demoRoot) {
 
     const box = document.createElement('input');
     box.type = 'checkbox';
+    box.id = 'demo-select-' + index;
+    box.name = 'demo-select';
     box.setAttribute('aria-label', 'Select ' + sender.name);
     box.addEventListener('change', updateBulkButton);
 
@@ -187,7 +189,7 @@ if (demoRoot) {
     rows.forEach(markUnsubscribed);
     updateHeader();
     updateBulkButton();
-    if (rows.length > 1) {
+    if (rows.length > 1 && unsubscribed.length < SENDERS.length) {
       report('Bulk unsubscribed from ' + rows.length + ' senders at once — ' +
         silencedPerWeek() + ' fewer emails a week. Bulk actions are a Pro feature.');
     } else {
