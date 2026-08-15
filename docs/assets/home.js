@@ -212,6 +212,67 @@ if (navCta && heroCta && hasObserver) {
   heroObserver.observe(heroCta);
 }
 
+// Pricing period toggle — the card shows one price at a time instead of
+// cramming both into the sub-line.
+const monthlyBtn = document.getElementById('billing-monthly');
+const yearlyBtn = document.getElementById('billing-yearly');
+const priceEl = document.getElementById('pricing-price');
+const periodEl = document.getElementById('pricing-period');
+const priceDescEl = document.getElementById('pricing-desc');
+
+const PLANS = {
+  monthly: {
+    amount: '$4.99',
+    period: '/month',
+    desc: 'Billed monthly · switch to yearly and pay half'
+  },
+  yearly: {
+    amount: '$29.99',
+    period: '/year',
+    desc: 'Works out to $2.50/month, billed once a year'
+  }
+};
+
+function showPlan(name) {
+  const plan = PLANS[name];
+  priceEl.firstChild.nodeValue = plan.amount + ' ';
+  periodEl.textContent = plan.period;
+  priceDescEl.textContent = plan.desc;
+  monthlyBtn.setAttribute('aria-pressed', String(name === 'monthly'));
+  yearlyBtn.setAttribute('aria-pressed', String(name === 'yearly'));
+}
+
+if (monthlyBtn && yearlyBtn) {
+  monthlyBtn.addEventListener('click', () => showPlan('monthly'));
+  yearlyBtn.addEventListener('click', () => showPlan('yearly'));
+  showPlan('yearly');
+}
+
+// Nav: shadow once the page is scrolled, and highlight the section in view
+const navEl = document.querySelector('nav');
+const sectionLinks = Array.from(document.querySelectorAll('.nav-links a[href^="#"]'));
+const sections = sectionLinks
+  .map(link => document.querySelector(link.getAttribute('href')))
+  .filter(Boolean);
+
+function markActiveSection() {
+  let activeId = '';
+  sections.forEach(section => {
+    if (section.getBoundingClientRect().top <= 140) activeId = section.id;
+  });
+  sectionLinks.forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + activeId);
+  });
+}
+
+function updateNavState() {
+  navEl.classList.toggle('scrolled', document.documentElement.scrollTop > 8);
+  markActiveSection();
+}
+
+window.addEventListener('scroll', updateNavState, { passive: true });
+updateNavState();
+
 // Mobile nav toggle
 const navToggle = document.getElementById('nav-toggle');
 const navLinks = document.getElementById('nav-links');

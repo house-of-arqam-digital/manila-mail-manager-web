@@ -7,7 +7,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Manila Mail Manager — Clean up your inbox</title>
-  <meta name="description" content="Find and unsubscribe from email subscriptions in Gmail in seconds. Free Chrome extension.">
+  <meta name="description" content="Find and unsubscribe from email subscriptions in Gmail in seconds. Try the demo inbox on this page — free Chrome extension, no account needed.">
   <link rel="icon" type="image/png" href="favicon.png">
 
   <!-- Open Graph -->
@@ -35,8 +35,9 @@
     "applicationCategory": "BrowserApplication",
     "operatingSystem": "Chrome",
     "offers": [
-      { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-      { "@type": "Offer", "price": "4.99", "priceCurrency": "USD" }
+      { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD" },
+      { "@type": "Offer", "name": "Pro monthly", "price": "4.99", "priceCurrency": "USD" },
+      { "@type": "Offer", "name": "Pro yearly", "price": "29.99", "priceCurrency": "USD" }
     ],
     "url": "https://manilamail.app/"
   }
@@ -44,12 +45,17 @@
 
   <link rel="stylesheet" href="assets/base.css">
   <link rel="stylesheet" href="assets/home.css">
+
+  <!-- In <head> so a stored theme override applies before first paint -->
+  <script src="assets/theme.js"></script>
 </head>
 <body>
   <svg class="icon-sprite" aria-hidden="true">
     <symbol id="icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
     <symbol id="icon-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></symbol>
     <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="icon-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></symbol>
   </svg>
 
   <div class="scroll-progress" id="scroll-progress"></div>
@@ -65,8 +71,13 @@
     </button>
     <div class="nav-links" id="nav-links">
       <a href="#how">How it works</a>
+      <a href="#demo">Try it</a>
       <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark mode" title="Switch to dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
       <a href="https://chromewebstore.google.com/detail/eapejkmfejkjkfjimeecbdpkhmkgeipl" target="_blank" rel="noopener" class="hero-cta nav-cta" id="nav-cta" tabindex="-1" aria-hidden="true" style="padding:8px 16px;font-size:13px;border-radius:8px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity 0.3s ease, visibility 0s linear 0.3s;">Add to Chrome</a>
     </div>
   </nav>
@@ -82,6 +93,7 @@
         <a href="https://chromewebstore.google.com/detail/eapejkmfejkjkfjimeecbdpkhmkgeipl" target="_blank" rel="noopener" class="hero-cta">
           Add to Chrome — It's Free
         </a>
+        <p class="hero-secondary">or <a href="#demo">try the demo inbox</a> first — no install needed.</p>
       </div>
       <div class="hero-visual reveal">
         <div class="folderframe">
@@ -99,7 +111,7 @@
   <div class="trust-strip reveal">
     <div class="trust-item">
       <svg><use href="#icon-lock"/></svg>
-      100% private — no data leaves your browser
+      Private by design — your email never leaves your browser
     </div>
     <div class="trust-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -108,6 +120,10 @@
     <div class="trust-item">
       <svg><use href="#icon-check-circle"/></svg>
       Free forever — upgrade only if you want
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="14" height="11" rx="2"/><path d="M16 9h4l2 3v3h-6z"/><path d="M6 19h.01M13 19h.01"/></svg>
+      Pro works on up to 3 devices
     </div>
   </div>
 
@@ -152,35 +168,35 @@
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg>
         </div>
-        <h3>Automatic detection</h3>
+        <h3>Automatic detection <span class="pro-tag">Pro</span></h3>
         <p>New subscriptions get tagged the moment they arrive — no re-scanning. Always on, and entirely in your browser.</p>
       </div>
       <div class="feature-card reveal reveal-delay-2">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         </div>
-        <h3>Bulk cleanup</h3>
+        <h3>Bulk cleanup <span class="pro-tag">Pro</span></h3>
         <p>Select several subscriptions and open their unsubscribe pages together, instead of hunting them down one at a time.</p>
       </div>
       <div class="feature-card reveal reveal-delay-2">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
         </div>
-        <h3>Insights engine</h3>
+        <h3>Insights engine <span class="pro-tag">Pro</span></h3>
         <p>See which subscriptions email you most, spot dormant ones and weekly trends, and get one-tap cleanup suggestions.</p>
       </div>
       <div class="feature-card reveal">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         </div>
-        <h3>Inbox health score</h3>
+        <h3>Inbox health score <span class="pro-tag">Pro</span></h3>
         <p>A single glanceable grade for how managed your subscriptions are — with a breakdown of what's dragging it down and the top fix to raise it.</p>
       </div>
       <div class="feature-card reveal reveal-delay-1">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
         </div>
-        <h3>Subscription spend tracker</h3>
+        <h3>Subscription spend tracker <span class="pro-tag">Pro</span></h3>
         <p>See every paid service emailing your inbox and track your monthly and yearly spend. Prices are auto-detected from invoices you open — no manual tallying.</p>
       </div>
       <div class="feature-card reveal reveal-delay-2">
@@ -197,6 +213,31 @@
         <h3>Private by design</h3>
         <p>All processing happens locally in your browser. Your email data is never sent to any external server.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- Interactive demo -->
+  <section class="demo" id="demo">
+    <div class="demo-inner">
+      <p class="section-label">Try it</p>
+      <h2 class="section-title">Clean up a demo inbox right here</h2>
+      <p class="section-lede">This is the extension's flow on a made-up inbox — scan it, then unsubscribe one sender or a few at once. Nothing is installed and nothing leaves this page.</p>
+      <div class="demo-panel reveal">
+        <div class="demo-head">
+          <span class="demo-title"><svg><use href="#icon-folder"/></svg> Demo inbox</span>
+          <span class="demo-count" id="demo-count" aria-live="polite"></span>
+        </div>
+        <div class="demo-actions">
+          <button class="demo-btn demo-btn-primary" id="demo-scan" type="button">
+            <svg><use href="#icon-search"/></svg> Scan inbox
+          </button>
+          <button class="demo-btn" id="demo-bulk" type="button" disabled>Unsubscribe selected <span class="pro-tag">Pro</span></button>
+          <button class="demo-btn demo-btn-ghost" id="demo-reset" type="button">Reset</button>
+        </div>
+        <ul class="demo-list" id="demo-list"></ul>
+        <p class="demo-status" id="demo-status" role="status"></p>
+      </div>
+      <p class="demo-footnote">In the real extension, Unsubscribe opens the sender's own unsubscribe page so you can confirm it.</p>
     </div>
   </section>
 
@@ -221,6 +262,7 @@
             <div class="stat-label">Saved per month<br>with Manila Mail</div>
           </div>
         </div>
+        <p class="stat-note">Rough figures for a typical personal Gmail account — your own numbers show up in the extension after your first scan.</p>
       </div>
       <!-- TODO: replace with updated screenshot of the new subscriptions page -->
       <img src="screenshot-subscriptions.png" alt="Manila Mail Manager subscription management" class="screenshot-img reveal reveal-delay-2" width="814" height="1134" loading="lazy">
@@ -232,6 +274,10 @@
     <div class="pricing-inner">
       <p class="section-label">Pricing</p>
       <h2 class="section-title">Free for most people. Pro for power users.</h2>
+      <div class="billing-toggle" role="group" aria-label="Billing period">
+        <button class="billing-option" id="billing-monthly" type="button" aria-pressed="false">Monthly</button>
+        <button class="billing-option" id="billing-yearly" type="button" aria-pressed="true">Yearly <span class="billing-save">Save 50%</span></button>
+      </div>
       <div class="pricing-cards reveal">
         <div class="pricing-card">
           <div class="pricing-name">Free</div>
@@ -241,14 +287,15 @@
             <li>Scan and detect subscriptions</li>
             <li>Easy unsubscribe</li>
             <li>Track up to 100 subscriptions</li>
+            <li>Works on every device you sign into</li>
             <li>Gmail badge indicators</li>
           </ul>
           <a href="https://chromewebstore.google.com/detail/eapejkmfejkjkfjimeecbdpkhmkgeipl" target="_blank" rel="noopener" class="pricing-btn pricing-btn-secondary">Add to Chrome</a>
         </div>
         <div class="pricing-card featured">
           <div class="pricing-name">Pro</div>
-          <div class="pricing-price">$29.99 <span>/year</span></div>
-          <div class="pricing-desc">$2.50/mo billed yearly (save 50%) · or $4.99/mo</div>
+          <div class="pricing-price" id="pricing-price">$29.99 <span id="pricing-period">/year</span></div>
+          <div class="pricing-desc" id="pricing-desc">Works out to $2.50/month, billed once a year</div>
           <ul class="pricing-features">
             <li>Everything in Free</li>
             <li>Inbox health score &amp; breakdown</li>
@@ -257,10 +304,12 @@
             <li>Auto-detect new subscriptions as they arrive</li>
             <li>Unlimited tracked subscriptions</li>
             <li>Bulk unsubscribe</li>
+            <li>Activate on up to 3 devices</li>
           </ul>
-          <!-- Pro is started from inside the extension; checkout.html needs a Paddle
-               transaction and can't be linked to directly. -->
-          <a href="#install" class="pricing-btn pricing-btn-primary">Start Free Trial</a>
+          <!-- Pro (and its trial) is started from inside the extension; checkout.html
+               needs a Paddle transaction and can't be linked to directly. -->
+          <a href="https://chromewebstore.google.com/detail/eapejkmfejkjkfjimeecbdpkhmkgeipl" target="_blank" rel="noopener" class="pricing-btn pricing-btn-primary">Add to Chrome</a>
+          <p class="pricing-note">Start the 7-day free trial from the extension — no card required. Cancel anytime.</p>
         </div>
       </div>
     </div>
@@ -299,7 +348,21 @@
           Can I cancel Pro anytime?
           <svg class="faq-icon"><use href="#icon-plus"/></svg>
         </button>
-        <div class="faq-answer" id="faq-4" role="region"><p>Yes. You can cancel your Pro subscription at any time — manage it from the extension's settings or through the receipt Paddle emails you. You'll keep Pro features until the end of your billing period.</p></div>
+        <div class="faq-answer" id="faq-4" role="region"><p>Yes. You can cancel your Pro subscription at any time — manage it from the extension's settings or through the receipt Paddle emails you. You'll keep Pro features until the end of your billing period, after which the extension returns to the free tier on its own.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false" aria-controls="faq-6">
+          How many devices does Pro cover?
+          <svg class="faq-icon"><use href="#icon-plus"/></svg>
+        </button>
+        <div class="faq-answer" id="faq-6" role="region"><p>Three. A Chrome profile counts as one device, so a work laptop, a home machine and a second profile all fit. If you run out — say after a reinstall or a new laptop — open Settings in the extension and choose <strong>Deactivate my other devices</strong>, then activate the one you're using. Sharing a key beyond that doesn't work: the fourth activation is refused.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false" aria-controls="faq-7">
+          Do I need to be online to use Pro?
+          <svg class="faq-icon"><use href="#icon-plus"/></svg>
+        </button>
+        <div class="faq-answer" id="faq-7" role="region"><p>Only occasionally. Activating Pro checks in with our licensing service, and the extension re-checks quietly in the background. If it can't reach us — offline, or a firewall in the way — Pro keeps working for three more days so an outage never locks you out.</p></div>
       </div>
       <div class="faq-item">
         <button class="faq-question" aria-expanded="false" aria-controls="faq-5">
@@ -326,5 +389,6 @@
   </footer>
 
   <script src="assets/home.js"></script>
+  <script src="assets/demo.js"></script>
 </body>
 </html>
