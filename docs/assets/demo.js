@@ -1,18 +1,25 @@
-// Sandbox copy of the extension popup for the home page: it fakes a scan of a
-// canned inbox so a visitor can try the scan -> review -> unsubscribe flow
-// before installing. Nothing here talks to Gmail or to any server.
+// Sandbox copy of the extension for the home page: a mixed inbox of real mail and
+// subscription mail, so a visitor can watch the scan tag only the subscriptions,
+// then unsubscribe or hide them. Nothing here talks to Gmail or to any server.
 
 const demoRoot = document.getElementById('demo');
 
 if (demoRoot) {
-  const SENDERS = [
-    { name: 'Medium Daily Digest', perWeek: 7 },
-    { name: 'Amazon', perWeek: 5 },
-    { name: 'Morning Brew', perWeek: 5 },
-    { name: 'Spotify', perWeek: 3 },
-    { name: 'Hacker Newsletter', perWeek: 1 },
-    { name: 'Old Navy', perWeek: 6 }
+  // perWeek is only meaningful for subscriptions; mail from people is left alone.
+  const MESSAGES = [
+    { sender: 'Maya Fernandez', subject: 'Re: dinner on Saturday?' },
+    { sender: 'Medium Daily Digest', subject: "Today's highlights for you", perWeek: 7 },
+    { sender: 'Old Navy', subject: '48 hours only — 50% off everything', perWeek: 6 },
+    { sender: 'Dad', subject: 'photos from the trip' },
+    { sender: 'Morning Brew', subject: 'Markets open higher ☕', perWeek: 5 },
+    { sender: 'Amazon', subject: 'Deals picked for you this week', perWeek: 5 },
+    { sender: 'Sam Chen', subject: 'Feedback on the Q3 deck' },
+    { sender: 'Spotify', subject: 'Your Discover Weekly is ready', perWeek: 3 },
+    { sender: 'Hacker Newsletter', subject: 'Issue #612', perWeek: 1 },
+    { sender: 'Priya (landlord)', subject: 'Lease renewal paperwork' }
   ];
+
+  const SUBS = MESSAGES.filter(message => message.perWeek);
 
   const reduceMotionDemo = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const list = document.getElementById('demo-list');
@@ -23,7 +30,7 @@ if (demoRoot) {
   const countEl = document.getElementById('demo-count');
   const statusEl = document.getElementById('demo-status');
 
-  // 'idle' before a scan, 'scanning' while rows appear, 'done' once scanned.
+  // 'idle' before a scan, 'scanning' while rows get tagged, 'done' once scanned.
   let state = 'idle';
   let unsubscribed = [];
   let scanTimers = [];
@@ -35,56 +42,43 @@ if (demoRoot) {
   }
 
   function silencedPerWeek() {
-    return unsubscribed.reduce((total, sender) => total + sender.perWeek, 0);
+    return unsubscribed.reduce((total, message) => total + message.perWeek, 0);
   }
 
-  function totalPerWeek() {
-    return SENDERS.reduce((total, sender) => total + sender.perWeek, 0);
+  function subsPerWeek() {
+    return SUBS.reduce((total, message) => total + message.perWeek, 0);
+  }
+
+  // Only tagged subscription rows are ever selectable, tidyable or unsubscribable —
+  // mail from people is untouched, exactly as in Gmail.
+  function subRows() {
+    return Array.from(list.querySelectorAll('.demo-row.is-sub'));
   }
 
   function selectedRows() {
-    return Array.from(list.querySelectorAll('.demo-row')).filter(row => {
+    return subRows().filter(row => {
       const box = row.querySelector('input');
       return box && box.checked && !row.classList.contains('gone');
     });
   }
 
+  function report(message) {
+    statusEl.textContent = message;
+  }
+
   function updateHeader() {
-    const remaining = SENDERS.length - unsubscribed.length;
     if (state === 'idle') {
-      countEl.textContent = totalPerWeek() + ' emails a week';
+      countEl.textContent = MESSAGES.length + ' emails · none tagged yet';
       return;
     }
+    const remaining = SUBS.length - unsubscribed.length;
     countEl.textContent = remaining + ' active · ' + silencedPerWeek() + ' emails a week silenced';
   }
 
-  function tidyableRows() {
-    return Array.from(list.querySelectorAll('.demo-row'));
-  }
-
   function updateWandButton() {
-    wandBtn.disabled = state !== 'done' || tidyableRows().length === 0;
+    wandBtn.disabled = state !== 'done' || subRows().length === 0;
     wandBtn.setAttribute('aria-pressed', tidied ? 'true' : 'false');
     wandBtn.lastChild.nodeValue = tidied ? ' Bring them back' : ' Hide them from view';
-  }
-
-  function setTidied(next) {
-    tidied = next;
-    const rows = tidyableRows();
-    rows.forEach(row => row.classList.toggle('tidied', tidied));
-    if (tidied) {
-      // Selecting rows you can no longer see would make bulk unsubscribe fire blind.
-      rows.forEach(row => { row.querySelector('input').checked = false; });
-    }
-    updateWandButton();
-    updateBulkButton();
-
-    if (tidied) {
-      report('Hid ' + rows.length + ' subscription ' + (rows.length === 1 ? 'email' : 'emails') +
-        ' from the view — nothing was deleted, archived or unsubscribed. Tap the wand again to bring them back.');
-    } else {
-      report(rows.length + ' ' + (rows.length === 1 ? 'email is' : 'emails are') + ' back, exactly as they were.');
-    }
   }
 
   function updateBulkButton() {
@@ -95,11 +89,33 @@ if (demoRoot) {
       : 'Unsubscribe selected ';
   }
 
+  function setTidied(next) {
+    tidied = next;
+    const rows = subRows();
+    rows.forEach(row => row.classList.toggle('tidied', tidied));
+    if (tidied) {
+      // Selecting rows you can no longer see would make bulk unsubscribe fire blind.
+      rows.forEach(row => { row.querySelector('input').checked = false; });
+    }
+    updateWandButton();
+    updateBulkButton();
+
+    const humans = MESSAGES.length - rows.length;
+    if (tidied) {
+      report('Hid ' + rows.length + ' subscription ' + (rows.length === 1 ? 'email' : 'emails') +
+        ' from the view — the ' + humans + ' emails from actual people stayed put, and nothing was ' +
+        'deleted, archived or unsubscribed. Tap the wand again to bring them back.');
+    } else {
+      report(rows.length + ' subscription ' + (rows.length === 1 ? 'email is' : 'emails are') +
+        ' back, exactly as they were.');
+    }
+  }
+
   function markUnsubscribed(row) {
     if (row.classList.contains('gone')) return;
-    const index = Number(row.dataset.index);
+    const message = MESSAGES[Number(row.dataset.index)];
     row.classList.add('gone');
-    unsubscribed.push(SENDERS[index]);
+    unsubscribed.push(message);
 
     const box = row.querySelector('input');
     box.checked = false;
@@ -112,40 +128,68 @@ if (demoRoot) {
     row.replaceChild(done, button);
   }
 
-  function report(message) {
-    statusEl.textContent = message;
-  }
-
   function reportProgress() {
     const silenced = silencedPerWeek();
-    if (unsubscribed.length === SENDERS.length) {
-      report('Inbox clear — all ' + SENDERS.length + ' subscriptions gone, ' + silenced +
+    if (unsubscribed.length === SUBS.length) {
+      report('Inbox clear — all ' + SUBS.length + ' subscriptions gone, ' + silenced +
         ' fewer emails a week. That is roughly ' + Math.round(silenced * 52) + ' a year.');
       return;
     }
-    report('Unsubscribed from ' + unsubscribed.length + ' of ' + SENDERS.length + ' — ' +
+    report('Unsubscribed from ' + unsubscribed.length + ' of ' + SUBS.length + ' — ' +
       silenced + ' fewer emails a week.');
   }
 
-  function addRow(sender, index) {
+  // Untagged row: what the inbox looks like before a scan, and what mail from
+  // people keeps looking like afterwards.
+  function addRow(message, index) {
     const row = document.createElement('li');
     row.className = 'demo-row';
     row.dataset.index = String(index);
+
+    const slot = document.createElement('span');
+    slot.className = 'demo-slot';
+
+    const meta = document.createElement('span');
+    meta.className = 'demo-meta';
+    const sender = document.createElement('span');
+    sender.className = 'demo-sender';
+    sender.textContent = message.sender;
+    const subject = document.createElement('span');
+    subject.className = 'demo-subject';
+    subject.textContent = message.subject;
+    meta.append(sender, subject);
+
+    const tag = document.createElement('span');
+    tag.className = 'demo-tagslot';
+
+    const action = document.createElement('span');
+    action.className = 'demo-actionslot';
+
+    row.append(slot, meta, tag, action);
+    list.appendChild(row);
+  }
+
+  // The scan's payoff: a subscription row gains the badge, a checkbox and an
+  // Unsubscribe button, which is what the extension adds to Gmail's own rows.
+  function tagRow(index) {
+    const message = MESSAGES[index];
+    const row = list.querySelector('.demo-row[data-index="' + index + '"]');
+    if (!row || !message.perWeek) return;
+
+    row.classList.add('is-sub');
 
     const box = document.createElement('input');
     box.type = 'checkbox';
     box.id = 'demo-select-' + index;
     box.name = 'demo-select';
-    box.setAttribute('aria-label', 'Select ' + sender.name);
+    box.setAttribute('aria-label', 'Select ' + message.sender);
     box.addEventListener('change', updateBulkButton);
+    row.querySelector('.demo-slot').appendChild(box);
 
-    const name = document.createElement('span');
-    name.className = 'demo-sender';
-    name.textContent = sender.name;
-
-    const freq = document.createElement('span');
-    freq.className = 'demo-freq';
-    freq.textContent = sender.perWeek + '/week';
+    const badge = document.createElement('span');
+    badge.className = 'demo-tag';
+    badge.textContent = 'Subscription · ' + message.perWeek + '/week';
+    row.querySelector('.demo-tagslot').appendChild(badge);
 
     const button = document.createElement('button');
     button.className = 'demo-unsub';
@@ -157,9 +201,8 @@ if (demoRoot) {
       updateBulkButton();
       reportProgress();
     });
+    row.querySelector('.demo-actionslot').appendChild(button);
 
-    row.append(box, name, freq, button);
-    list.appendChild(row);
     if (tidied) row.classList.add('tidied');
   }
 
@@ -169,34 +212,45 @@ if (demoRoot) {
     scanBtn.textContent = 'Re-scan inbox';
     updateHeader();
     updateWandButton();
-    report('Found ' + SENDERS.length + ' subscriptions sending you ' + totalPerWeek() +
-      ' emails a week. Unsubscribe from one, or tick a few and use bulk unsubscribe.');
+    report('Tagged ' + SUBS.length + ' subscriptions sending you ' + subsPerWeek() +
+      ' emails a week, and left the ' + (MESSAGES.length - SUBS.length) +
+      ' emails from real people alone. Unsubscribe from one, tick a few for bulk, or ' +
+      'hide them all from view with the wand.');
+  }
+
+  function renderInbox() {
+    clearList();
+    MESSAGES.forEach(addRow);
   }
 
   function scan() {
     scanTimers.forEach(clearTimeout);
     scanTimers = [];
-    clearList();
     unsubscribed = [];
     state = 'scanning';
     tidied = false;
+    renderInbox();
     scanBtn.disabled = true;
     scanBtn.textContent = 'Scanning…';
     bulkBtn.disabled = true;
     updateWandButton();
     report('Scanning your inbox — reading sender and subject lines only, all in this tab.');
 
+    const subIndexes = MESSAGES
+      .map((message, index) => (message.perWeek ? index : -1))
+      .filter(index => index >= 0);
+
     if (reduceMotionDemo) {
-      SENDERS.forEach(addRow);
+      subIndexes.forEach(tagRow);
       finishScan();
       return;
     }
 
-    SENDERS.forEach((sender, index) => {
+    subIndexes.forEach((index, order) => {
       scanTimers.push(setTimeout(() => {
-        addRow(sender, index);
-        if (index === SENDERS.length - 1) finishScan();
-      }, 180 + index * 260));
+        tagRow(index);
+        if (order === subIndexes.length - 1) finishScan();
+      }, 180 + order * 260));
     });
   }
 
@@ -206,20 +260,15 @@ if (demoRoot) {
     state = 'idle';
     unsubscribed = [];
     tidied = false;
-    clearList();
-
-    const empty = document.createElement('li');
-    empty.className = 'demo-empty';
-    empty.textContent = 'This demo inbox has ' + SENDERS.length +
-      ' subscriptions hiding in it. Scan to find them.';
-    list.appendChild(empty);
+    renderInbox();
 
     scanBtn.disabled = false;
     scanBtn.textContent = 'Scan inbox';
     bulkBtn.disabled = true;
     updateHeader();
     updateWandButton();
-    report('Click “Scan inbox” — nothing leaves this page.');
+    report('An ordinary inbox: real mail mixed in with ' + SUBS.length +
+      ' subscriptions. Click “Scan inbox” to see which is which — nothing leaves this page.');
   }
 
   bulkBtn.addEventListener('click', () => {
@@ -227,7 +276,7 @@ if (demoRoot) {
     rows.forEach(markUnsubscribed);
     updateHeader();
     updateBulkButton();
-    if (rows.length > 1 && unsubscribed.length < SENDERS.length) {
+    if (rows.length > 1 && unsubscribed.length < SUBS.length) {
       report('Bulk unsubscribed from ' + rows.length + ' senders at once — ' +
         silencedPerWeek() + ' fewer emails a week. Bulk actions are a Pro feature.');
     } else {
