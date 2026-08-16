@@ -68,6 +68,25 @@ extraction landed):
 - **Mobile nav** — resize the OS window (`wmctrl -r :ACTIVE: -e 0,0,0,430,760`) rather than using
   devtools device mode; `#nav-toggle` appears and `#nav-links` gets `.open`.
 
+## The demo inbox (`docs/assets/demo.js`)
+
+`#demo` is a sandbox copy of the extension: 10 rows of mixed mail render on load, and a scan tags
+only the subscription rows (`.is-sub` + checkbox + `Subscription · N/week` badge + Unsubscribe).
+
+- Row controls live in `.demo-slot` / `.demo-tagslot` / `.demo-actionslot` wrappers, **not** as
+  direct children of `.demo-row`. DOM surgery that assumes otherwise throws (`replaceChild`
+  `NotFoundError`), so check the console after *every* demo click — the row can look half-updated
+  while the header and status silently stop advancing.
+- Verify unsubscribe both ways: a single row's button, and bulk with 2+ ticked. A throw inside
+  `markUnsubscribed()` aborts the bulk `forEach`, so bulk marking only the first row is the
+  signature of that bug.
+- The reduced-motion branch is read **at page load**, so set the DevTools rendering override and
+  *then* reload, or the scan still animates.
+- To prove tagging causes no layout shift, record `getBoundingClientRect().top` for every
+  `.demo-row` before and after the scan and compare — cheaper and stricter than eyeballing.
+- When re-testing a one-line fix, `curl http://localhost:8899/assets/demo.js | grep <expression>`
+  first; it rules out a stale served/cached asset for free.
+
 ## checkout.html
 
 `docs/checkout.html` loads real Paddle from `https://cdn.paddle.com/paddle/v2/paddle.js` and
