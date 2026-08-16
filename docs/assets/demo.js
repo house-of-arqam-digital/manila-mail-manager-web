@@ -18,6 +18,7 @@ if (demoRoot) {
   const list = document.getElementById('demo-list');
   const scanBtn = document.getElementById('demo-scan');
   const bulkBtn = document.getElementById('demo-bulk');
+  const wandBtn = document.getElementById('demo-wand');
   const resetBtn = document.getElementById('demo-reset');
   const countEl = document.getElementById('demo-count');
   const statusEl = document.getElementById('demo-status');
@@ -26,6 +27,8 @@ if (demoRoot) {
   let state = 'idle';
   let unsubscribed = [];
   let scanTimers = [];
+  // Mirrors Magic Cleanup in the extension: a view filter, nothing more.
+  let tidied = false;
 
   function clearList() {
     while (list.firstChild) list.removeChild(list.firstChild);
@@ -53,6 +56,35 @@ if (demoRoot) {
       return;
     }
     countEl.textContent = remaining + ' active · ' + silencedPerWeek() + ' emails a week silenced';
+  }
+
+  function tidyableRows() {
+    return Array.from(list.querySelectorAll('.demo-row'));
+  }
+
+  function updateWandButton() {
+    wandBtn.disabled = state !== 'done' || tidyableRows().length === 0;
+    wandBtn.setAttribute('aria-pressed', tidied ? 'true' : 'false');
+    wandBtn.lastChild.nodeValue = tidied ? ' Bring them back' : ' Hide them from view';
+  }
+
+  function setTidied(next) {
+    tidied = next;
+    const rows = tidyableRows();
+    rows.forEach(row => row.classList.toggle('tidied', tidied));
+    if (tidied) {
+      // Selecting rows you can no longer see would make bulk unsubscribe fire blind.
+      rows.forEach(row => { row.querySelector('input').checked = false; });
+    }
+    updateWandButton();
+    updateBulkButton();
+
+    if (tidied) {
+      report('Hid ' + rows.length + ' subscription ' + (rows.length === 1 ? 'email' : 'emails') +
+        ' from the view — nothing was deleted, archived or unsubscribed. Tap the wand again to bring them back.');
+    } else {
+      report(rows.length + ' ' + (rows.length === 1 ? 'email is' : 'emails are') + ' back, exactly as they were.');
+    }
   }
 
   function updateBulkButton() {
@@ -128,6 +160,7 @@ if (demoRoot) {
 
     row.append(box, name, freq, button);
     list.appendChild(row);
+    if (tidied) row.classList.add('tidied');
   }
 
   function finishScan() {
@@ -135,6 +168,7 @@ if (demoRoot) {
     scanBtn.disabled = false;
     scanBtn.textContent = 'Re-scan inbox';
     updateHeader();
+    updateWandButton();
     report('Found ' + SENDERS.length + ' subscriptions sending you ' + totalPerWeek() +
       ' emails a week. Unsubscribe from one, or tick a few and use bulk unsubscribe.');
   }
@@ -145,9 +179,11 @@ if (demoRoot) {
     clearList();
     unsubscribed = [];
     state = 'scanning';
+    tidied = false;
     scanBtn.disabled = true;
     scanBtn.textContent = 'Scanning…';
     bulkBtn.disabled = true;
+    updateWandButton();
     report('Scanning your inbox — reading sender and subject lines only, all in this tab.');
 
     if (reduceMotionDemo) {
@@ -169,6 +205,7 @@ if (demoRoot) {
     scanTimers = [];
     state = 'idle';
     unsubscribed = [];
+    tidied = false;
     clearList();
 
     const empty = document.createElement('li');
@@ -181,6 +218,7 @@ if (demoRoot) {
     scanBtn.textContent = 'Scan inbox';
     bulkBtn.disabled = true;
     updateHeader();
+    updateWandButton();
     report('Click “Scan inbox” — nothing leaves this page.');
   }
 
@@ -197,6 +235,7 @@ if (demoRoot) {
     }
   });
 
+  wandBtn.addEventListener('click', () => setTidied(!tidied));
   scanBtn.addEventListener('click', scan);
   resetBtn.addEventListener('click', reset);
   reset();
