@@ -125,7 +125,7 @@ if (demoRoot) {
     const done = document.createElement('span');
     done.className = 'demo-done';
     done.textContent = 'Unsubscribed ✓';
-    row.replaceChild(done, button);
+    button.parentNode.replaceChild(done, button);
   }
 
   function reportProgress() {
