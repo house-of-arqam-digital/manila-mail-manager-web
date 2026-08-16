@@ -213,6 +213,13 @@
         <h3>Ignore a sender</h3>
         <p>Keep a newsletter you actually want but stop Manila Mail from flagging it. Ignoring hides the sender from your lists and Gmail badges — it doesn't unsubscribe you or block anyone, and you can restore it any time.</p>
       </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 4V2"/><path d="M15 16v-2"/><path d="M8 9h2"/><path d="M20 9h2"/><path d="M17.8 11.8 19 13"/><path d="M15 9h0"/><path d="M17.8 6.2 19 5"/><path d="m3 21 9-9"/><path d="M12.2 6.2 11 5"/></svg>
+        </div>
+        <h3>One-click tidy inbox</h3>
+        <p>Tap the wand in Gmail's toolbar and every subscription email folds out of view, so what's left is the mail from actual people. Tap it again to bring them all back — nothing is archived, deleted or marked read.</p>
+      </div>
       <div class="feature-card reveal reveal-delay-2">
         <div class="feature-icon">
           <svg><use href="#icon-lock"/></svg>
@@ -239,12 +246,13 @@
             <svg><use href="#icon-search"/></svg> Scan inbox
           </button>
           <button class="demo-btn" id="demo-bulk" type="button" disabled>Unsubscribe selected <span class="pro-tag">Pro</span></button>
+          <button class="demo-btn" id="demo-wand" type="button" disabled aria-pressed="false"><span class="demo-wand-icon" aria-hidden="true">🪄</span> Hide them from view</button>
           <button class="demo-btn demo-btn-ghost" id="demo-reset" type="button">Reset</button>
         </div>
         <ul class="demo-list" id="demo-list"></ul>
         <p class="demo-status" id="demo-status" role="status"></p>
       </div>
-      <p class="demo-footnote">In the real extension, Unsubscribe opens the sender's own unsubscribe page so you can confirm it.</p>
+      <p class="demo-footnote">In the real extension, Unsubscribe opens the sender's own unsubscribe page so you can confirm it, and the wand sits next to Gmail's Compose button.</p>
     </div>
   </section>
 
@@ -356,6 +364,13 @@
           <svg class="faq-icon"><use href="#icon-plus"/></svg>
         </button>
         <div class="faq-answer" id="faq-8" role="region"><p>It hides that sender inside Manila Mail Manager: they drop out of your subscription list, stop being counted in your stats, and lose their Gmail badge. Nothing changes about your actual mail — you stay subscribed, the sender isn't blocked, and their emails keep arriving in Gmail as normal. It's for newsletters you want to keep but don't want flagged. Ignoring covers the whole brand, so a company's other sending addresses go quiet too. To undo it, open <strong>Subscriptions</strong>, switch the filter to <strong>Ignored</strong>, and hit <strong>Restore</strong> — your history for that sender comes back with it.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false" aria-controls="faq-9">
+          What does the wand button in Gmail do?
+          <svg class="faq-icon"><use href="#icon-plus"/></svg>
+        </button>
+        <div class="faq-answer" id="faq-9" role="region"><p>It's a one-click tidy: every subscription email in the list you're looking at folds out of view, leaving the mail from real people. It's a view filter and nothing more — those emails aren't archived, deleted, marked read or moved, and Gmail itself is untouched. Tap the wand again to bring them all back, or open the counter next to it to see exactly what's hidden and unhide individual emails. Anything you hide comes back on its own when you switch labels, search, or reload Gmail. It's free, and you can turn the button off in <strong>Settings</strong> if you'd rather not see it.</p></div>
       </div>
       <div class="faq-item">
         <button class="faq-question" aria-expanded="false" aria-controls="faq-4">

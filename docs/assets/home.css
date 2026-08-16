@@ -307,6 +307,10 @@ nav::after {
   background: var(--accent-d); color: light-dark(#fff, #1B1710); border-color: transparent;
 }
 .demo-btn-ghost { background: none; border-color: transparent; color: var(--soft); }
+.demo-btn[aria-pressed="true"] {
+  background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink);
+}
+.demo-wand-icon { font-size: 14px; line-height: 1; }
 .demo-btn svg { width: 15px; height: 15px; }
 
 .demo-list { list-style: none; margin: 0; min-height: 232px; }
@@ -315,14 +319,25 @@ nav::after {
   align-items: center; gap: 12px;
   padding: 11px 18px; border-bottom: 1px solid var(--border);
   animation: demoIn 0.32s ease both;
+  max-height: 200px; overflow: hidden;
 }
 .demo-row:last-child { border-bottom: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .demo-row {
+    transition: max-height 0.3s ease, opacity 0.22s ease, padding 0.3s ease;
+  }
+}
 @keyframes demoIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .demo-row input { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; }
 .demo-sender { font-size: 14px; font-weight: 600; }
 .demo-freq { font-size: 12px; color: var(--soft); white-space: nowrap; }
 .demo-row.gone { opacity: 0.55; }
 .demo-row.gone .demo-sender { text-decoration: line-through; }
+/* The wand is a view filter: rows fold away and come back untouched. */
+.demo-row.tidied {
+  max-height: 0; opacity: 0; visibility: hidden;
+  padding-top: 0; padding-bottom: 0; border-bottom-width: 0;
+}
 .demo-unsub {
   padding: 5px 11px; border-radius: 7px; cursor: pointer;
   background: none; border: 1px solid var(--accent); color: var(--accent);
