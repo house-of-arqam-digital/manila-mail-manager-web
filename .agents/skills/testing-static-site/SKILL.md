@@ -67,6 +67,12 @@ extraction landed):
   and `aria-expanded`.
 - **Mobile nav** — resize the OS window (`wmctrl -r :ACTIVE: -e 0,0,0,430,760`) rather than using
   devtools device mode; `#nav-toggle` appears and `#nav-links` gets `.open`.
+  Measure the actual viewport: Chrome may clamp native windows to 500 CSS px despite a smaller
+  requested width. For exact narrower coverage, use DevTools responsive mode (Ctrl+Shift+I,
+  Ctrl+Shift+M), set width/height explicitly, and scroll inside the emulated page. In mobile
+  emulation, compare `document.documentElement.clientWidth` and `visualViewport.width`;
+  horizontal overflow can inflate `innerWidth`. Attribute unexpected overflow by checking the
+  same viewport against a baseline worktree before treating it as a regression.
 
 ## The demo inbox (`docs/assets/demo.js`)
 
