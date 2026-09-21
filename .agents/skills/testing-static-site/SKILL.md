@@ -45,21 +45,26 @@ address bar**, not page content. Zoom-crop it to confirm before reporting a real
 
 ## Things that need explicit verification (they are easy to silently break)
 
-Home-page behavior lives in `docs/assets/home.js` (inline in `index.html` before the asset
-extraction landed):
+Home-page behavior lives in `docs/assets/home.js`. The page is static by design (editorial
+layout: espresso masthead, numbered ledger, two-tone pricing) — there are no counters, roller,
+typing line, scroll-progress bar or scroll reveals, so blank space or a missing element is a real
+bug, not an animation that has not fired yet.
 
-- **Counters** (`.counter[data-target]`) animate to 47 / 68% / 2 hrs. Capture mid-animation
-  (intermediate values like 19 / 28% / 1 hrs) — a screenshot of the final numbers does not prove
-  the animation ran.
-- **Hero roller** (`#hero-roller`) cycles values every 3 s from a fixed list; screenshot twice
-  ~4 s apart and check the number changed.
-- **Typing line** (`#typing-line`) cycles four phrases with a caret.
-- **Scroll progress bar** (`#scroll-progress`) — zoom the top ~10 px strip; it is thin and easy to
-  miss in a full screenshot.
-- **IntersectionObserver reveals** — `.reveal`, `.pricing-features`, `.counter` fire once per
-  element; reload the page to re-observe them.
+- **Web fonts** — Fraunces (headlines, `.serif`) and Inter are self-hosted from
+  `docs/assets/fonts/` and every page's CSP carries `font-src 'self'`. Check
+  `document.fonts.check('16px Fraunces')` and that headings do not render in Georgia; a CSP
+  violation in the console means a page's meta tag lost `font-src`.
+- **Espresso bands** — `.masthead`, `.plan-pro` and `.closing` set `color-scheme: dark` and stay
+  dark in both themes; only the body sections flip with `data-theme` / the OS preference. The
+  folder frame around the hero screenshot stays kraft (fixed colors) in both.
+- **Pricing toggle** — `#billing-yearly` is pressed on load ($29.99 /year); `#billing-monthly`
+  swaps `#pricing-price`/`#pricing-period`/`#pricing-desc` to $4.99 /month.
+- **Theme init race** — an extension in the test Chrome profile has been seen adding
+  `class="js" data-theme="dark"` to `<html>` on first load; if a "light" screenshot comes out
+  dark with `localStorage.mmm-theme` unset, that is the profile, not `theme.js`. Reload.
 - **SVG sprite icons** — `index.html` defines a hidden `<svg class="icon-sprite">` with
-  `#icon-lock`, `#icon-check-circle`, `#icon-plus`, referenced via `<use href="#...">`. A broken
+  `#icon-plus` (FAQ), and `demo.html` with `#icon-folder`, `#icon-search`, referenced via
+  `<use href="#...">`. A broken
   sprite id renders as *blank space*, not a broken-image marker, and the stripped DOM still shows
   `<svg></svg>`. **Always confirm icons visually in a zoomed screenshot** — DOM inspection will not
   catch this class of bug.
@@ -74,9 +79,11 @@ extraction landed):
   horizontal overflow can inflate `innerWidth`. Attribute unexpected overflow by checking the
   same viewport against a baseline worktree before treating it as a regression.
 
-## The demo inbox (`docs/assets/demo.js`)
+## The demo inbox (`docs/demo.html`, `docs/assets/demo.js`)
 
-`#demo` is a sandbox copy of the extension: 10 rows of mixed mail render on load, and a scan tags
+The demo lives on its own page (linked from the hero "Try the demo inbox →", the nav and the
+footer); `demo.js` is a no-op without `#demo`, so it is not loaded on the home page. `#demo` is a
+sandbox copy of the extension: 10 rows of mixed mail render on load, and a scan tags
 only the subscription rows (`.is-sub` + checkbox + `Subscription · N/week` badge + Unsubscribe).
 
 - Row controls live in `.demo-slot` / `.demo-tagslot` / `.demo-actionslot` wrappers, **not** as

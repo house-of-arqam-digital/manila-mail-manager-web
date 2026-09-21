@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Demo inbox — Manila Mail Manager</title>
+  <meta name="description" content="Try Manila Mail Manager on a made-up inbox, right in your browser: scan it, see which mail is a subscription, and unsubscribe — no install needed.">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="canonical" href="https://manilamail.app/demo.html">
+  <link rel="stylesheet" href="assets/base.css">
+  <link rel="stylesheet" href="assets/home.css">
+  <link rel="stylesheet" href="assets/demo.css">
+  <script src="assets/theme.js"></script>
+</head>
+<body>
+  <svg class="icon-sprite" aria-hidden="true">
+    <symbol id="icon-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></symbol>
+  </svg>
+
+  <header class="masthead">
+    <div class="wrap">
+      <nav>
+        <a href="/" class="nav-logo">
+          <img src="icon.png" alt="" width="30" height="30">
+          Manila Mail Manager
+        </a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="nav-links" id="nav-links">
+          <a href="index.html#how">How it works</a>
+          <a href="demo.html" class="active">Try the demo</a>
+          <a href="index.html#pricing">Pricing</a>
+          <a href="index.html#faq">FAQ</a>
+          <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark mode" title="Switch to dark mode">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+          </button>
+          <a href="https://chromewebstore.google.com/detail/eapejkmfejkjkfjimeecbdpkhmkgeipl" target="_blank" rel="noopener" class="btn btn-amber btn-nav">Add to Chrome</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap demo" id="demo">
+    <div class="demo-inner">
+      <p class="eyebrow">Demo inbox</p>
+      <h1 class="serif">Clean up a made-up inbox right here.</h1>
+      <p class="section-lede">Real mail and subscription mail mixed together, running the extension's own flow: scan it to see which is which, then unsubscribe one sender, a few at once, or fold them all out of view. Nothing here touches Gmail or leaves your browser.</p>
+      <div class="demo-panel">
+        <div class="demo-head">
+          <span class="demo-title"><svg aria-hidden="true"><use href="#icon-folder"/></svg> Demo inbox</span>
+          <span class="demo-count" id="demo-count" aria-live="polite"></span>
+        </div>
+        <div class="demo-actions">
+          <button class="demo-btn demo-btn-primary" id="demo-scan" type="button">
+            <svg aria-hidden="true"><use href="#icon-search"/></svg> Scan inbox
+          </button>
+          <button class="demo-btn" id="demo-bulk" type="button" disabled>Unsubscribe selected <span class="pro-tag">Pro</span></button>
+          <button class="demo-btn" id="demo-wand" type="button" disabled aria-pressed="false"><span class="demo-wand-icon" aria-hidden="true">🪄</span> Hide them from view</button>
+          <button class="demo-btn demo-btn-ghost" id="demo-reset" type="button">Reset</button>
+        </div>
+        <ul class="demo-list" id="demo-list"></ul>
+        <p class="demo-status" id="demo-status" role="status"></p>
+      </div>
+      <p class="demo-footnote">In the real extension the tags appear on Gmail's own rows, Unsubscribe opens the sender's own unsubscribe page so you can confirm it, and the wand sits next to Gmail's Compose button.</p>
+    </div>
+  </main>
+
+  <section class="closing">
+    <div class="wrap closing-grid">
+      <div>
+        <h2 class="serif">Your inbox, <em>minus the noise.</em></h2>
+        <p>Free to install. Two minutes to a clean inbox.</p>
+      </div>
+      <div class="closing-cta">
+        <a href="https://chromewebstore.google.com/detail/eapejkmfejkjkfjimeecbdpkhmkgeipl" target="_blank" rel="noopener" class="btn btn-amber">Add to Chrome — free</a>
+      </div>
+    </div>
+    <footer class="wrap">
+      <div class="footer-left">
+        <img src="hoa-logo.png" alt="House of Arqam Ventures LLC" width="24" height="24" loading="lazy">
+        © House of Arqam Ventures LLC · makers of <a href="https://sponsir.app" rel="noopener">Sponsir</a>
+      </div>
+      <div class="footer-links">
+        <a href="demo.html">Demo</a>
+        <a href="support.html">Support</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="terms.html#refunds">Refunds</a>
+      </div>
+    </footer>
+  </section>
+
+  <script src="assets/home.js"></script>
+  <script src="assets/demo.js"></script>
+</body>
+</html>
